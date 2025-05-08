@@ -7,7 +7,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Route placeholders for products and users
+// Routes
+const userRoutes = require('./routes/users');
+app.use('/api/auth', userRoutes);
+
+// Route placeholders
 app.get('/api/products', (req, res) => {
   res.json([
     { id: 1, name: 'Basketball', price: 29.99 },
@@ -20,6 +24,7 @@ app.get('/api/users', (req, res) => {
     { id: 1, name: 'Jane Doe', email: 'jane@example.com' }
   ]);
 });
+
 
 app.listen(PORT, () => {
   console.log(`API running on port ${PORT}`);
