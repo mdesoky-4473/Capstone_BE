@@ -24,7 +24,7 @@ app.get('/api/products', async (req, res) => {
     const result = await client.query('SELECT * FROM products ORDER BY id');
     res.json(result.rows);  
   } catch (err) {
-    console.error('Error fetching products:', err);  
+    console.error('❌ Error fetching products:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
