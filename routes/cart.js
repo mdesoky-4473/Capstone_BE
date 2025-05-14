@@ -1,3 +1,4 @@
+const client = require('../db/client');
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -20,68 +21,84 @@ function authenticateToken(req, res, next) {
 }
 
 // GET user's cart
-router.get('/', authenticateToken, (req, res) => {
-    const userId = req.user.id;
-    const userCart = carts[userId] || [];
+router.get('/', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
 
-    const products = req.app.locals.products;
-  
-      const detailedCart = userCart.map(item => {
-      const product = products.find(p => p.id === item.productId);
+  try {
+    // Get all cart items for this user
+    const cartResult = await client.query(`
+      SELECT * FROM cart_items WHERE user_id = $1
+    `, [userId]);
+
+    const cartItems = cartResult.rows;
+
+    // Get product info 
+    const productIds = cartItems.map(item => item.product_id);
+    const placeholders = productIds.map((_, i) => `$${i + 1}`).join(', ');
+
+    let products = [];
+    if (productIds.length > 0) {
+      const productResult = await client.query(
+        `SELECT id, name, price FROM products WHERE id IN (${placeholders})`,
+        productIds
+      );
+      products = productResult.rows;
+    }
+
+    // Build cart with product details
+    const detailedCart = cartItems.map(item => {
+      const product = products.find(p => p.id === item.product_id);
       return {
-        productId: item.productId,
+        productId: item.product_id,
         quantity: item.quantity,
-        name: product?.name,       
-        price: product?.price      
+        name: product?.name,
+        price: product?.price
       };
     });
-  
-    res.json(detailedCart);
-  });
 
-// POST item to cart
-router.post('/', authenticateToken, (req, res) => {
+    res.json(detailedCart);
+  } catch (err) {
+    console.error('Error fetching cart:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+router.post('/', authenticateToken, async (req, res) => {
   const userId = req.user.id;
   const { productId, quantity } = req.body;
 
-  carts[userId] = carts[userId] || [];
-
-  const existingItem = carts[userId].find(item => item.productId === productId);
-
-  if (existingItem) {
-    existingItem.quantity += quantity;
-  } else {
-    carts[userId].push({ productId, quantity });
+  if (!productId || !quantity) {
+    return res.status(400).json({ message: 'Product ID and quantity required' });
   }
 
-  res.status(201).json(carts[userId]);
+  try {
+    // Check if the product exists
+    const existing = await client.query(
+      'SELECT * FROM cart_items WHERE user_id = $1 AND product_id = $2',
+      [userId, productId]
+    );
+
+    if (existing.rows.length > 0) {
+      // Update the quantity
+      const updated = await client.query(
+        'UPDATE cart_items SET quantity = quantity + $1 WHERE user_id = $2 AND product_id = $3 RETURNING *',
+        [quantity, userId, productId]
+      );
+      return res.status(200).json(updated.rows[0]);
+    } else {
+      // Insert a new item
+      const inserted = await client.query(
+        'INSERT INTO cart_items (user_id, product_id, quantity) VALUES ($1, $2, $3) RETURNING *',
+        [userId, productId, quantity]
+      );
+      return res.status(201).json(inserted.rows[0]);
+    }
+  } catch (err) {
+    console.error('Error adding to cart:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-// DELETE item
-router.delete('/:productId', authenticateToken, (req, res) => {
-  const userId = req.user.id;
-  const productId = parseInt(req.params.productId);
-
-  if (!carts[userId]) return res.sendStatus(404);
-
-  carts[userId] = carts[userId].filter(item => item.productId !== productId);
-  res.json(carts[userId]);
-});
-
-// PUT - update quantity
-router.put('/:productId', authenticateToken, (req, res) => {
-  const userId = req.user.id;
-  const productId = parseInt(req.params.productId);
-  const { quantity } = req.body;
-
-  const cart = carts[userId];
-  if (!cart) return res.sendStatus(404);
-
-  const item = cart.find(item => item.productId === productId);
-  if (!item) return res.sendStatus(404);
-
-  item.quantity = quantity;
-  res.json(cart);
-});
 
 module.exports = router;
