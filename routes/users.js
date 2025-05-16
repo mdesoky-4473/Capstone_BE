@@ -1,39 +1,76 @@
+const client = require('../db/client');
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
-const users = []; 
 const SECRET = process.env.JWT_SECRET;
 
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
   const { email, password } = req.body;
 
-  const existingUser = users.find((u) => u.email === email);
-  if (existingUser) return res.status(400).json({ message: 'User already exists' });
+  try {
+    const existing = await client.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-  const hashed = await bcrypt.hash(password, 10);
-  const newUser = { id: users.length + 1, email, password: hashed };
+    // Hash password
+    const hashed = await bcrypt.hash(password, 10);
 
-  users.push(newUser);
+    // Insert user
+    const result = await client.query(
+      `INSERT INTO users (email, password)
+       VALUES ($1, $2)
+       RETURNING id, email`,
+      [email, hashed]
+    );
 
-  const token = jwt.sign({ id: newUser.id, email }, SECRET, { expiresIn: '1h' });
-  res.json({ token, user: { id: newUser.id, email } });
+    const newUser = result.rows[0];
+
+    const token = jwt.sign({ id: newUser.id, email }, SECRET, { expiresIn: '1h' });
+
+    res.json({ token, user: newUser });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = users.find((u) => u.email === email);
-  if (!user) return res.status(400).json({ message: 'Invalid email or password' });
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ message: 'Invalid email or password' });
+  try {
+    const result = await client.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
 
-  const token = jwt.sign({ id: user.id, email }, SECRET, { expiresIn: '1h' });
-  res.json({ token, user: { id: user.id, email } });
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
 
+    // Compare password
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // Sign token
+    const token = jwt.sign({ id: user.id, email }, SECRET, { expiresIn: '1h' });
+
+    res.json({ token, user: { id: user.id, email } });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
+
 
 module.exports = router;

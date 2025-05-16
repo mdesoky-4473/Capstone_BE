@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 
 const SECRET = process.env.JWT_SECRET;
 
-const carts = {}; 
-
 // Middleware to check token and extract user
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -47,7 +45,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
     // Build cart with product details
     const detailedCart = cartItems.map(item => {
-      const product = products.find(p => p.id === item.product_id);
+    const product = products.find(p => p.id === item.product_id);
       return {
         productId: item.product_id,
         quantity: item.quantity,
