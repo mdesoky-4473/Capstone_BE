@@ -61,7 +61,7 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-
+// Add item to cart
 router.post('/', authenticateToken, async (req, res) => {
   const userId = req.user.id;
   const { productId, quantity } = req.body;
@@ -98,5 +98,57 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
+// Update cart item quantity
+router.put('/:productId', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const productId = parseInt(req.params.productId);
+  const { quantity } = req.body;
+
+  if (!quantity || quantity < 1) {
+    return res.status(400).json({ message: 'Quantity must be at least 1' });
+  }
+
+  try {
+    const result = await client.query(
+      `UPDATE cart_items 
+       SET quantity = $1 
+       WHERE user_id = $2 AND product_id = $3 
+       RETURNING *`,
+      [quantity, userId, productId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Cart item not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating cart:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.delete('/:productId', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const productId = parseInt(req.params.productId);
+
+  try {
+    const result = await client.query(
+      `DELETE FROM cart_items 
+       WHERE user_id = $1 AND product_id = $2 
+       RETURNING *`,
+      [userId, productId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Cart item not found' });
+    }
+
+    res.json({ message: 'Item removed from cart' });
+  } catch (err) {
+    console.error('Error deleting cart item:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;
