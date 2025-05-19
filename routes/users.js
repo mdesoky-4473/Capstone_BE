@@ -7,8 +7,13 @@ const router = express.Router();
 const SECRET = process.env.JWT_SECRET;
 
 // POST /api/auth/signup
+// POST /api/auth/signup
 router.post('/signup', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
 
   try {
     const existing = await client.query(
@@ -19,15 +24,13 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
     const hashed = await bcrypt.hash(password, 10);
 
-    // Insert user
     const result = await client.query(
-      `INSERT INTO users (email, password)
-       VALUES ($1, $2)
-       RETURNING id, email`,
-      [email, hashed]
+      `INSERT INTO users (username, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, username, email`,
+      [username, email, hashed]
     );
 
     const newUser = result.rows[0];
