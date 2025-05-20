@@ -47,11 +47,16 @@ async function seed() {
     await client.query(`
       INSERT INTO products (name, description, price, image_url, stock_quantity)
       VALUES 
-        ('Wireless Mouse', 'Ergonomic and battery-powered', 29.99, 'https://via.placeholder.com/150', 100),
-        ('Bluetooth Headphones', 'Noise-cancelling over-ear', 99.99, 'https://via.placeholder.com/150', 50),
-        ('USB-C Hub', 'Multiport adapter with HDMI and USB 3.0', 39.99, 'https://via.placeholder.com/150', 75),
-        ('Laptop Stand', 'Aluminum adjustable stand', 49.99, 'https://via.placeholder.com/150', 60),
-        ('Mechanical Keyboard', 'Backlit keys and fast response', 89.99, 'https://via.placeholder.com/150', 80);
+        ('Basketball', 'Official size and weight basketball suitable for indoor/outdoor play.', 29.99, 'https://via.placeholder.com/150', 100),
+        ('Soccer Ball', 'Durable synthetic leather soccer ball for training and matches.', 24.99, 'https://via.placeholder.com/150', 80),
+        ('Tennis Racket', 'Lightweight graphite tennis racket with comfortable grip.', 59.99, 'https://via.placeholder.com/150', 60),
+        ('Running Shoes', 'Breathable running shoes with cushioned soles.', 89.99, 'https://via.placeholder.com/150', 120),
+        ('Yoga Mat', 'Non-slip yoga mat with carrying strap.', 19.99, 'https://via.placeholder.com/150', 150),
+        ('Baseball Glove', 'Leather baseball glove for right-handed throwers.', 39.99, 'https://via.placeholder.com/150', 70),
+        ('Dumbbell Set', 'Adjustable dumbbell set from 5 to 25 lbs.', 79.99, 'https://via.placeholder.com/150', 50),
+        ('Jump Rope', 'Speed jump rope with ball bearings for smooth rotation.', 14.99, 'https://via.placeholder.com/150', 200),
+        ('Water Bottle', 'Insulated stainless steel water bottle, 32oz.', 12.99, 'https://via.placeholder.com/150', 180),
+        ('Cycling Helmet', 'Lightweight helmet with airflow vents and adjustable straps.', 49.99, 'https://via.placeholder.com/150', 90);
     `);
 
     // Create an admin user
