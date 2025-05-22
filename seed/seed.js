@@ -47,16 +47,16 @@ async function seed() {
     await client.query(`
       INSERT INTO products (name, description, price, image_url, stock_quantity)
       VALUES 
-        ('Basketball', 'Official size and weight basketball suitable for indoor/outdoor play.', 29.99, 'https://via.placeholder.com/150', 100),
-        ('Soccer Ball', 'Durable synthetic leather soccer ball for training and matches.', 24.99, 'https://via.placeholder.com/150', 80),
-        ('Tennis Racket', 'Lightweight graphite tennis racket with comfortable grip.', 59.99, 'https://via.placeholder.com/150', 60),
-        ('Running Shoes', 'Breathable running shoes with cushioned soles.', 89.99, 'https://via.placeholder.com/150', 120),
-        ('Yoga Mat', 'Non-slip yoga mat with carrying strap.', 19.99, 'https://via.placeholder.com/150', 150),
-        ('Baseball Glove', 'Leather baseball glove for right-handed throwers.', 39.99, 'https://via.placeholder.com/150', 70),
-        ('Dumbbell Set', 'Adjustable dumbbell set from 5 to 25 lbs.', 79.99, 'https://via.placeholder.com/150', 50),
-        ('Jump Rope', 'Speed jump rope with ball bearings for smooth rotation.', 14.99, 'https://via.placeholder.com/150', 200),
-        ('Water Bottle', 'Insulated stainless steel water bottle, 32oz.', 12.99, 'https://via.placeholder.com/150', 180),
-        ('Cycling Helmet', 'Lightweight helmet with airflow vents and adjustable straps.', 49.99, 'https://via.placeholder.com/150', 90);
+        ('Basketball', 'Official size and weight basketball suitable for indoor/outdoor play.', 29.99, 'https://target.scene7.com/is/image/Target/GUEST_20affc7e-e0d7-4eb6-a6f3-68d13520f8be?wid=1200&hei=1200&qlt=80&fmt=webp', 100),
+        ('Soccer Ball', 'Durable synthetic leather soccer ball for training and matches.', 24.99, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwP84bXC89RiNFstVvK_sKLjn_FZZ9HvV8yA&s', 80),
+        ('Tennis Racket', 'Lightweight graphite tennis racket with comfortable grip.', 59.99, 'https://nwscdn.com/media/wysiwyg/3kf/tennis/Well_Balanced_Tennis_Racket_For_Senior_Tennis_Players.jpg', 60),
+        ('Running Shoes', 'Breathable running shoes with cushioned soles.', 89.99, 'https://cdn.thewirecutter.com/wp-content/media/2024/11/runningshoes-2048px-09517.jpg?auto=webp&quality=75&width=1024', 120),
+        ('Yoga Mat', 'Non-slip yoga mat with carrying strap.', 19.99, 'https://www.huggermugger.com/wp-content/uploads/2022/07/ultimate-cushion-yoga-mat_black_01___64388.1692990322.1280.1280-jpg.webp', 150),
+        ('Baseball Glove', 'Leather baseball glove for right-handed throwers.', 39.99, 'https://www.diamondsportgear.com/cdn/shop/files/Nokona_Ballglove_Alpha_Select_Edge_S100_I-web-9-800x800.jpg?v=1732028173&width=720', 70),
+        ('Dumbbell Set', 'Adjustable dumbbell set from 5 to 25 lbs.', 79.99, 'https://m.media-amazon.com/images/I/71bxRATPpIL._AC_UF1000,1000_QL80_.jpg', 50),
+        ('Jump Rope', 'Speed jump rope with ball bearings for smooth rotation.', 14.99, 'https://img.lakeshorelearning.com/is/image/OCProduction/fb188?wid=800&fmt=jpeg&qlt=85,1&pscan=auto&op_sharpen=0&resMode=sharp2&op_usm=1,0.65,6,0', 200),
+        ('Water Bottle', 'Insulated stainless steel water bottle, 32oz.', 12.99, 'https://i.etsystatic.com/11471603/r/il/57f627/2355415200/il_fullxfull.2355415200_9h58.jpg', 180),
+        ('Cycling Helmet', 'Lightweight helmet with airflow vents and adjustable straps.', 49.99, 'https://m.media-amazon.com/images/I/61C+CXVy85L.jpg', 90);
     `);
 
     // Create an admin user
