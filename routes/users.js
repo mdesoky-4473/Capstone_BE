@@ -7,7 +7,6 @@ const router = express.Router();
 const SECRET = process.env.JWT_SECRET;
 
 // POST /api/auth/signup
-// POST /api/auth/signup
 router.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
